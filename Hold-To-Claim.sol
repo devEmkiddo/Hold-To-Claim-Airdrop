@@ -159,7 +159,7 @@ contract Airdrop{
         owner = payable(msg.sender);
     }
 
-    function claimAirdrop() public payable noReentrancy{
+    function claimAirdrop() external payable noReentrancy{
         require(tokenHold.balanceOf(msg.sender) > 0, "Must hold X token to be eligible for this airdrop");
         require(token.balanceOf(address(this)) >= airdropAmount, "Insufficient contract balance");
         require(msg.value == airdropFee, "Invalid Fee Amount");
@@ -167,14 +167,14 @@ contract Airdrop{
         emit Airdropped(msg.sender, airdropAmount);
     }
 
-    function withdrawEth() public onlyOwner noReentrancy{
+    function withdrawEth() external onlyOwner noReentrancy{
         uint256 contractBal = address(this).balance;
         require(contractBal > 0, "Insufficient contract balance");
         (bool success, ) = payable(owner).call{value: contractBal}("");
         require(success, "Failed");
         emit Withdrawal(address(this), msg.sender, contractBal);
     }
-    function withdrawToken() public onlyOwner noReentrancy{
+    function withdrawToken() external onlyOwner{
         uint contractBal = token.balanceOf(address(this));
          require(contractBal > 0, "Insufficient contract balance");
          token.transfer(owner, contractBal);
@@ -191,7 +191,7 @@ contract Airdrop{
       emit ChangedOwnership(msg.sender, _newOwner);
     }
 
-    function emergencyExit() public onlyOwner{
+    function emergencyExit() external onlyOwner{
         withdrawEth();
         withdrawToken();
     }
